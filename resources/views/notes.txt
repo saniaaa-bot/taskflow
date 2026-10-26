@@ -1,0 +1,17 @@
+Task Data Model:
+- Title (String)
+- Description (Text)
+- Status (Pending / Completed)
+- Due Date (Optional)
+
+CRUD Operations:
+Create: Add new task
+Read: View task list
+Update: Edit task/status
+Delete: Remove task
+
+Planned API Routes:
+- GET /tasks
+- POST /tasks
+- PUT /tasks/{id}
+- DELETE /tasks/{id}
