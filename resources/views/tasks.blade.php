@@ -49,7 +49,6 @@
 
     <div class="max-w-5xl w-full mt-4">
         
-        <!-- Top Navigation -->
         <header class="flex justify-between items-center mb-8 bg-white/60 backdrop-blur-lg px-6 py-4 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/80">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-gradient-to-tr from-brand-purple to-brand-pink rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30">
@@ -59,21 +58,17 @@
             </div>
         </header>
 
-        <!-- Success Message -->
         @if(session('success'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl relative mb-6 shadow-sm" role="alert">
                 <span class="block sm:inline font-bold">{{ session('success') }}</span>
             </div>
         @endif
 
-        <!-- Bento Grid Layout -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            <!-- Left Side: Add Task Form -->
             <div class="md:col-span-1 bg-white/80 backdrop-blur-xl p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white h-fit">
                 <h2 class="text-xl font-heading font-bold text-brand-dark mb-6">Add a Task</h2>
                 
-                <!-- Form Connected to Backend -->
                 <form action="{{ route('tasks.store') }}" method="POST" class="flex flex-col gap-4">
                     @csrf
                     <div>
@@ -97,10 +92,8 @@
                 </form>
             </div>
 
-            <!-- Right Side: Task List -->
             <div class="md:col-span-2 flex flex-col gap-4">
                 
-                <!-- Stats row -->
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-white/80 backdrop-blur-xl p-5 rounded-[2rem] shadow-sm border border-white flex items-center justify-between">
                         <div>
@@ -122,7 +115,6 @@
                     </div>
                 </div>
 
-                <!-- Task Cards Container (Dynamic from Database) -->
                 <div class="bg-white/60 backdrop-blur-xl p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white h-full">
                     <h3 class="text-lg font-heading font-bold text-brand-dark mb-4">Your Tasks</h3>
                     
@@ -131,22 +123,42 @@
                             <p class="text-center text-slate-500 py-6">No tasks yet. Add your first task!</p>
                         @else
                             @foreach($tasks as $task)
-                                <!-- Task Item -->
-                                <label class="flex items-center gap-4 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
-                                    <div class="w-6 h-6 rounded-full border-2 border-slate-300 flex items-center justify-center group-hover:border-brand-purple transition-colors">
-                                        <div class="w-3 h-3 rounded-full bg-brand-purple opacity-0 group-hover:opacity-50 transition-opacity"></div>
-                                    </div>
-                                    <div class="flex-1">
+                                <div class="flex items-center gap-4 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow group">
+                                    
+                                    <form action="{{ route('tasks.status', $task->id) }}" method="POST" class="m-0">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="w-6 h-6 rounded-full border-2 border-slate-300 flex items-center justify-center group-hover:border-brand-purple transition-colors {{ $task->status == 'Completed' ? 'bg-green-500 border-green-500' : '' }}">
+                                            @if($task->status == 'Completed')
+                                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                            @endif
+                                        </button>
+                                    </form>
+
+                                    <div class="flex-1 {{ $task->status == 'Completed' ? 'opacity-50 line-through' : '' }}">
                                         <h4 class="font-bold text-slate-800 transition-colors">{{ $task->title }}</h4>
                                         <p class="text-sm text-slate-500 mt-0.5 transition-colors">{{ $task->description }}</p>
                                         @if($task->due_date)
                                             <p class="text-xs text-brand-purple font-semibold mt-1">Due: {{ $task->due_date }}</p>
                                         @endif
                                     </div>
-                                    <span class="text-xs font-bold text-yellow-600 bg-yellow-100 px-3 py-1 rounded-lg">
+                                    
+                                    <span class="text-xs font-bold {{ $task->status == 'Pending' ? 'text-yellow-600 bg-yellow-100' : 'text-green-600 bg-green-100' }} px-3 py-1 rounded-lg">
                                         {{ $task->status }}
                                     </span>
-                                </label>
+
+                                    <a href="{{ route('tasks.edit', $task->id) }}" class="text-blue-400 hover:text-blue-600 font-bold text-sm mr-2 transition-colors" title="Edit Task">
+                                        Edit
+                                    </a>
+
+                                    <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" class="m-0">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-400 hover:text-red-600 transition-colors" title="Delete Task">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
+                                    </form>
+                                </div>
                             @endforeach
                         @endif
                     </div>
